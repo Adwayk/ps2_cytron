@@ -1,0 +1,130 @@
+#include <SoftwareSerial.h>
+#include <Cytron_PS2Shield.h>
+
+Cytron_PS2Shield ps2(2,3);
+
+//Pin declaration
+const int frntL = 10; //depends on your pin config    frnt =front
+const int frntR = 11;    //back = back
+const int backL = 9;     // R/L = left or right
+const int backR = 6;      // d = dir else pwm
+const int dfrntL = 8;
+const int dfrntR = 12;
+const int dbackL = 7;
+const int dbackR = 13;
+
+void setup()       //initalization
+{ 
+
+  pinMode(frntL,OUTPUT);
+  pinMode(frntR,OUTPUT);
+  pinMode(backL,OUTPUT);
+  pinMode(backR,OUTPUT);
+  pinMode(dfrntL,OUTPUT);//H back
+  pinMode(dfrntR,OUTPUT);//H back
+  pinMode(dbackL,OUTPUT); //H front
+  pinMode(dbackR,OUTPUT); //H front
+  digitalWrite(dfrntR,LOW);
+  analogWrite(frntR,0);
+  digitalWrite(dbackR,HIGH);
+  analogWrite(backR,0);
+  digitalWrite(dfrntL,LOW);
+  analogWrite(frntL,0);
+  digitalWrite(dbackL,HIGH);
+  analogWrite(backL,0);
+  ps2.begin(9600);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+//front 
+  if((ps2.readButton(PS2_JOYSTICK_RIGHT_Y_AXIS)<100 ) //FOR analog REPLACE 255 WITH map(ps2.readButton(PS2_JOYSTICK_RIGHT_Y_AXIS),0,100,255,0)
+  {
+  digitalWrite(dfrntR,HIGH);
+  analogWrite(frntR,255);
+  digitalWrite(dfrntL,HIGH);
+  analogWrite(frntL,255);
+  digitalWrite(dbackR,LOW);
+  analogWrite(backR,255);
+  digitalWrite(dbackL,LOW);
+  analogWrite(backL,255);
+    
+  }
+  //back
+  else if(ps2.readButton(PS2_JOYSTICK_RIGHT_Y_AXIS)>155 ) //map(ps2.readButton(PS2_JOYSTICK_RIGHT_Y_AXIS),255,155,255,0)
+  {
+     digitalWrite(dfrntR,LOW);
+     analogWrite(frntR,255);
+     digitalWrite(dbackR,HIGH);
+     analogWrite(backR,255);
+     digitalWrite(dfrntL,LOW);
+     analogWrite(frntL,255);
+     digitalWrite(dbackL,HIGH);
+     analogWrite(backL,255);
+      
+      
+    
+  }
+  //clockwise spot turn
+  else if(ps2.readButton(PS2_JOYSTICK_LEFT_X_AXIS)>155 )
+  {
+      digitalWrite(dfrntR,HIGH);
+      analogWrite(frntR, 128);
+      digitalWrite(dbackR,LOW);
+      analogWrite(backR, 128);
+      digitalWrite(dfrntL,LOW);
+      analogWrite(frntL, 255);
+      digitalWrite(dbackL,HIGH);
+      analogWrite(backL, 255);  
+  }
+  //anticlockwise spot turn
+  else if(ps2.readButton(PS2_JOYSTICK_LEFT_X_AXIS)<100 )
+  {
+      digitalWrite(dfrntR,LOW);
+      analogWrite(frntR, 255);
+      digitalWrite(dbackR,HIGH);
+      analogWrite(backR, 255);
+      digitalWrite(dfrntL,HIGH);
+      analogWrite(frntL, 128);
+      digitalWrite(dbackL,LOW);
+      analogWrite(backL, 128);
+      
+  }
+  else if(ps2.readButton(PS2_RIGHT_1)==0 )
+  {
+      digitalWrite(dfrntR,LOW);
+      analogWrite(frntR,128);
+      digitalWrite(dbackR,HIGH);
+      analogWrite(backR,128);
+      digitalWrite(dfrntL,LOW);
+      analogWrite(frntL,128);
+      digitalWrite(dbackL,HIGH);
+      analogWrite(backL,128);
+      
+   }
+else if(ps2.readButton(PS2_LEFT_1)==0 )
+  {
+      digitalWrite(dfrntR,HIGH);
+      analogWrite(frntR,128);
+      digitalWrite(dfrntL,HIGH);
+      analogWrite(frntL,128);
+      digitalWrite(dbackR,LOW);
+      analogWrite(backR,128);
+      digitalWrite(dbackL,LOW);
+      analogWrite(backL,128);
+      Serial.print("back");  
+  }
+else
+{
+    digitalWrite(dfrntR,LOW);
+    analogWrite(frntR,0);
+    digitalWrite(dbackR,HIGH);
+    analogWrite(backR,0);
+    digitalWrite(dfrntL,LOW);
+    analogWrite(frntL, 0);
+    digitalWrite(dbackL,HIGH);
+    analogWrite(backL, 0);
+    Serial.print("left"); 
+}
+}
